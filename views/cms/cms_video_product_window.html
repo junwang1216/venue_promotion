@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>项目介绍</title>
+    <link href="/public/lib/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/public/lib/videojs/video-js.min.css" rel="stylesheet" type="text/css">
+    <style>
+        .video-content {
+            position: relative;
+        }
+        .video-content .video-table {
+            opacity: 0.6;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 100;
+            height: 100%;
+            width: 220px;
+        }
+        .video-content .video-table .video-item {
+            height: 25%;
+            padding: 10px;
+            background: #000;
+            border: 4px solid #333;
+            color: #FFF;
+            margin: 0;
+            border-radius: 6px;
+        }
+        .video-content .video-table .video-item .media-object {
+            width: 40px;
+        }
+        .video-content .video-table .video-item .video-to-play {
+            color: #5bc0de;
+        }
+        .video-content .video-table .video-item .video-to-block {
+            color: #eea236;
+        }
+        .video-content .video-table .video-item.video-item-active,
+        .video-content .video-table .video-item:focus,
+        .video-content .video-table .video-item:hover {
+            border-color: #5bc0de;
+        }
+        .video-show .video-js {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<section class="video-content" id="video_product">
+    <div class="video-table">
+        <div class="media video-item video-item-active" data-block="member" data-play-range="0,10">
+            <div class="media-left media-middle">
+                <img class="media-object" src="/public/images/icons/user-group.png" alt="会员档案">
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading">会员档案</h4>
+                <div>
+                    <a class="btn btn-link video-to-play" href="#">>>播放介绍</a>
+                    <a class="btn btn-link video-to-block" href="#">>>模块体验</a>
+                </div>
+            </div>
+        </div>
+        <div class="media video-item" data-block="venue" data-play-range="10,20">
+            <div class="media-left media-middle">
+                <img class="media-object" src="/public/images/icons/arena.png" alt="场馆预订">
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading">场馆预订</h4>
+                <div>
+                    <a class="btn btn-link video-to-play" href="#">>>播放介绍</a>
+                    <a class="btn btn-link video-to-block" href="#">>>模块体验</a>
+                </div>
+            </div>
+        </div>
+        <div class="media video-item" data-block="good" data-play-range="20,30">
+            <div class="media-left media-middle">
+                <img class="media-object" src="/public/images/icons/ingredients.png" alt="商品管理">
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading">商品管理</h4>
+                <div>
+                    <a class="btn btn-link video-to-play" href="#">>>播放介绍</a>
+                    <a class="btn btn-link video-to-block" href="#">>>模块体验</a>
+                </div>
+            </div>
+        </div>
+        <div class="media video-item" data-block="chart" data-play-range="30">
+            <div class="media-left media-middle">
+                <img class="media-object" src="/public/images/icons/combo-chart.png" alt="数据统计">
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading">数据统计</h4>
+                <div>
+                    <a class="btn btn-link video-to-play" href="#">>>播放介绍</a>
+                    <a class="btn btn-link video-to-block" href="#">>>模块体验</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="video-show">
+        <video id="video_product_show" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="none"
+               poster="http://vjs.zencdn.net/v/oceans.png" data-setup="{}">
+            <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+            <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+            <source src="http://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+            <p class="vjs-no-js">Not support HTML5 video</p>
+        </video>
+    </div>
+</section>
+<script src="/public/lib/jquery/jquery-1.12.3.min.js"></script>
+<script src="/public/lib/videojs/video.min.js"></script>
+<script>
+    // 数据
+    var data = {
+        member: [0, 10],
+        venue: [10, 20],
+        good: [20, 30],
+        chart: [30]
+    };
+    // 获取模块
+    function getBlockName(time) {
+        for (var name in data) {
+            var start = data[name][0];
+            var end = data[name][1];
+
+            if (end) {
+                if (time > start && time < end) {
+                    return name;
+                }
+            } else {
+                if (time > start && time < end) {
+                    return name;
+                }
+            }
+        }
+        return "member";
+    }
+
+    // video设置
+    videojs.options.flash.swf = "/public/lib/videojs/video-js.swf";
+
+    var myPlayer = videojs("video_product_show");
+
+    myPlayer.width($(window).width());
+    myPlayer.height($(window).height());
+
+    videojs("video_product_show").ready(function () {
+        var myPlayer = this;
+
+        var videoEnd = function () {
+            //console.log('ended')
+        };
+
+        myPlayer.on("ended", videoEnd);
+
+        var videoProgress = function () {
+            var time = myPlayer.currentTime();
+            var $item = $(".video-item[data-block='" + getBlockName(time) + "']");
+
+            if ($item.hasClass("video-item-active")) {
+                return;
+            } else {
+                $item.addClass("video-item-active").siblings().removeClass("video-item-active");
+            }
+        };
+
+        myPlayer.on("timeupdate", videoProgress);
+
+        //myPlayer.play();
+    });
+
+    // 连接操作
+    var $videoTable = $(".video-table");
+    $videoTable.on("click", ".video-to-play", function (e) {
+        e.preventDefault();
+
+        var $this = $(this);
+        var $item = $this.parents(".video-item");
+        var range = data[$item.attr("data-block")];
+
+        if (!$this.hasClass("video-item-active")) {
+            myPlayer.currentTime(parseInt(range[0]));
+            myPlayer.play();
+
+            $this.addClass("video-item-active").siblings().removeClass("video-item-active");
+        }
+    });
+    $videoTable.on("click", ".video-to-block", function (e) {
+        e.preventDefault();
+
+        myPlayer.pause();
+        window.open("http://www.baidu.com", "_blank");
+    });
+</script>
+</body>
+</html>
